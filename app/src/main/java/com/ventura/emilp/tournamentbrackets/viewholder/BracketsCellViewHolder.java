@@ -1,11 +1,12 @@
 package com.ventura.emilp.tournamentbrackets.viewholder;
 
-import android.support.v7.widget.RecyclerView;
 import android.view.View;
 import android.view.animation.Animation;
 import android.view.animation.LinearInterpolator;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
+
+import androidx.recyclerview.widget.RecyclerView;
 
 import com.ventura.emilp.tournamentbrackets.R;
 import com.ventura.emilp.tournamentbrackets.animation.SlideAnimation;
