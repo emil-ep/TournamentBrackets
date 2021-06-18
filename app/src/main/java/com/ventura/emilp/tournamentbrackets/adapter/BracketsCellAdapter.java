@@ -2,10 +2,11 @@ package com.ventura.emilp.tournamentbrackets.adapter;
 
 import android.content.Context;
 import android.os.Handler;
-import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+
+import androidx.recyclerview.widget.RecyclerView;
 
 import com.ventura.emilp.tournamentbrackets.Fragment.BracketsColomnFragment;
 import com.ventura.emilp.tournamentbrackets.R;
