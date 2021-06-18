@@ -1,10 +1,9 @@
 package com.ventura.emilp.tournamentbrackets.application;
 
 import android.app.Application;
-import android.util.DisplayMetrics;
 
 /**
- * Created by vyshnav on 21/10/17.
+ * Created by Emil on 21/10/17.
  */
 
 public class BracketsApplication extends Application {

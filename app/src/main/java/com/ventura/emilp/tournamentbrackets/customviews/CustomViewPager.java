@@ -1,8 +1,9 @@
 package com.ventura.emilp.tournamentbrackets.customviews;
 import android.content.Context;
-import android.support.v4.view.ViewPager;
 import android.util.AttributeSet;
 import android.view.MotionEvent;
+
+import androidx.viewpager.widget.ViewPager;
 
 /**
  * Created by Emil on 21/10/17.

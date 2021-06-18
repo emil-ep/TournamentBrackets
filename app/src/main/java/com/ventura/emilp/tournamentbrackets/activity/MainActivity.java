@@ -1,10 +1,10 @@
 package com.ventura.emilp.tournamentbrackets.activity;
 
-import android.app.FragmentManager;
-import android.support.v4.app.FragmentTransaction;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.fragment.app.FragmentManager;
+import androidx.fragment.app.FragmentTransaction;
+
 import android.os.Bundle;
-import android.support.v7.app.ActionBarActivity;
-import android.support.v7.app.AppCompatActivity;
 import android.util.DisplayMetrics;
 
 import com.ventura.emilp.tournamentbrackets.Fragment.BracketsFragment;
@@ -28,7 +28,7 @@ public class MainActivity extends AppCompatActivity {
     private void initialiseBracketsFragment() {
 
         bracketFragment = new BracketsFragment();
-        android.support.v4.app.FragmentManager manager = getSupportFragmentManager();
+        FragmentManager manager = getSupportFragmentManager();
         FragmentTransaction transaction = manager.beginTransaction();
         transaction.replace(R.id.container, bracketFragment, "brackets_home_fragment");
         transaction.commit();
