@@ -1,4 +1,4 @@
-package com.ventura.emilp.tournamentbrackets.Fragment;
+package com.ventura.emilp.tournamentbrackets.fragment;
 
 import android.os.Bundle;
 

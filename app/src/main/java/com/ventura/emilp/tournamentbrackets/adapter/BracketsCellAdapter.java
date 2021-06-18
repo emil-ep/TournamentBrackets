@@ -8,7 +8,7 @@ import android.view.ViewGroup;
 
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.ventura.emilp.tournamentbrackets.Fragment.BracketsColomnFragment;
+import com.ventura.emilp.tournamentbrackets.fragment.BracketsColomnFragment;
 import com.ventura.emilp.tournamentbrackets.R;
 import com.ventura.emilp.tournamentbrackets.model.MatchData;
 import com.ventura.emilp.tournamentbrackets.viewholder.BracketsCellViewHolder;

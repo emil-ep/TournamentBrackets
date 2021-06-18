@@ -7,7 +7,7 @@ import androidx.fragment.app.FragmentTransaction;
 import android.os.Bundle;
 import android.util.DisplayMetrics;
 
-import com.ventura.emilp.tournamentbrackets.Fragment.BracketsFragment;
+import com.ventura.emilp.tournamentbrackets.fragment.BracketsFragment;
 import com.ventura.emilp.tournamentbrackets.R;
 import com.ventura.emilp.tournamentbrackets.application.BracketsApplication;
 

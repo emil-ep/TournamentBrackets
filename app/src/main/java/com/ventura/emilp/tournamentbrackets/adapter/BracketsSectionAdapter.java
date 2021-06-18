@@ -6,7 +6,7 @@ import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentStatePagerAdapter;
 
-import com.ventura.emilp.tournamentbrackets.Fragment.BracketsColomnFragment;
+import com.ventura.emilp.tournamentbrackets.fragment.BracketsColomnFragment;
 import com.ventura.emilp.tournamentbrackets.model.ColomnData;
 
 import java.util.ArrayList;
