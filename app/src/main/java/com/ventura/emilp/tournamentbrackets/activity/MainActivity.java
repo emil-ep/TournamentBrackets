@@ -1,6 +1,7 @@
 package com.ventura.emilp.tournamentbrackets.activity;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.fragment.app.FragmentActivity;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
 
@@ -13,7 +14,7 @@ import com.ventura.emilp.tournamentbrackets.application.BracketsApplication;
 
 
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends FragmentActivity {
 
 
     private BracketsFragment bracketFragment;
