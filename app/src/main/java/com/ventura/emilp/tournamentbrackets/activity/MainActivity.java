@@ -1,16 +1,15 @@
 package com.ventura.emilp.tournamentbrackets.activity;
 
-import androidx.appcompat.app.AppCompatActivity;
+import android.os.Bundle;
+import android.util.DisplayMetrics;
+
 import androidx.fragment.app.FragmentActivity;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
 
-import android.os.Bundle;
-import android.util.DisplayMetrics;
-
-import com.ventura.emilp.tournamentbrackets.fragment.BracketsFragment;
 import com.ventura.emilp.tournamentbrackets.R;
 import com.ventura.emilp.tournamentbrackets.application.BracketsApplication;
+import com.ventura.emilp.tournamentbrackets.fragment.BracketsFragment;
 
 
 
