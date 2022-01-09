@@ -34,7 +34,7 @@ https://user-images.githubusercontent.com/32976134/122669203-d7966c00-d1d9-11eb-
 
   ```
   dependencies {
-	        implementation 'com.github.Emil333:TournamentBracketLib:1.0.1'
+	        implementation 'com.github.emil-ep:TournamentBracketLib:1.0.4'
 	}
   ```
   
