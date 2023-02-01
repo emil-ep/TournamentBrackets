@@ -89,7 +89,6 @@ https://user-images.githubusercontent.com/32976134/122669203-d7966c00-d1d9-11eb-
   
 - All set 👏🏻
 
-- Additional functionalities like double elimination mode, single elimination mode are available in a premium version. Please contact emilpradeep@gmail.com for more   details
 
 
   
