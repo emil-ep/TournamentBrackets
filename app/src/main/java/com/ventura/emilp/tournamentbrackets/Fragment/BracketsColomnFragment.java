@@ -35,6 +35,12 @@ public class BracketsColomnFragment extends Fragment {
     private ArrayList<MatchData> list;
     private BracketsCellAdapter adapter;
 
+    @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        getExtras();
+    }
+
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
@@ -45,7 +51,6 @@ public class BracketsColomnFragment extends Fragment {
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        getExtras();
         initAdapter();
     }
 
@@ -97,6 +102,7 @@ public class BracketsColomnFragment extends Fragment {
     }
 
     public void expandHeight(int height) {
+        if (list == null) return;
         for (MatchData data : list) {
             data.setHeight(height);
         }
@@ -106,6 +112,7 @@ public class BracketsColomnFragment extends Fragment {
     }
 
     public void shrinkView(int height) {
+        if (list == null) return;
         for (MatchData data : list) {
             data.setHeight(height);
         }

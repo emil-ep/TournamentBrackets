@@ -125,18 +125,25 @@ public class BracketsFragment extends Fragment implements ViewPager.OnPageChange
     public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
 
         if (mCurrentPagerState != ViewPager.SCROLL_STATE_SETTLING) {
+            BracketsColomnFragment currentFragment = getBracketsFragment(position);
+            BracketsColomnFragment nextFragment = getBracketsFragment(position + 1);
+
             // We are moving to next screen on right side
             if (positionOffset > 0.5) {
                 // Closer to next screen than to current
                 if (position + 1 != mNextSelectedScreen) {
                     mNextSelectedScreen = position + 1;
                     //update view here
-                    if (getBracketsFragment(position).getColomnList().get(0).getHeight()
-                            != BracketsUtility.dpToPx(131))
-                        getBracketsFragment(position).shrinkView(BracketsUtility.dpToPx(131));
-                    if (getBracketsFragment(position + 1).getColomnList().get(0).getHeight()
-                            != BracketsUtility.dpToPx(131))
-                        getBracketsFragment(position + 1).shrinkView(BracketsUtility.dpToPx(131));
+                    if (currentFragment != null && currentFragment.getColomnList() != null && !currentFragment.getColomnList().isEmpty()) {
+                        if (currentFragment.getColomnList().get(0).getHeight() != BracketsUtility.dpToPx(131)) {
+                            currentFragment.shrinkView(BracketsUtility.dpToPx(131));
+                        }
+                    }
+                    if (nextFragment != null && nextFragment.getColomnList() != null && !nextFragment.getColomnList().isEmpty()) {
+                        if (nextFragment.getColomnList().get(0).getHeight() != BracketsUtility.dpToPx(131)) {
+                            nextFragment.shrinkView(BracketsUtility.dpToPx(131));
+                        }
+                    }
                 }
             } else {
                 // Closer to current screen than to next
@@ -144,16 +151,17 @@ public class BracketsFragment extends Fragment implements ViewPager.OnPageChange
                     mNextSelectedScreen = position;
                     //updateViewhere
 
-                    if (getBracketsFragment(position + 1).getCurrentBracketSize() ==
-                            getBracketsFragment(position + 1).getPreviousBracketSize()) {
-                        getBracketsFragment(position + 1).shrinkView(BracketsUtility.dpToPx(131));
-                        getBracketsFragment(position).shrinkView(BracketsUtility.dpToPx(131));
-                    } else {
-                        int currentFragmentSize = getBracketsFragment(position + 1).getCurrentBracketSize();
-                        int previousFragmentSize = getBracketsFragment(position + 1).getPreviousBracketSize();
-                        if (currentFragmentSize != previousFragmentSize) {
-                            getBracketsFragment(position + 1).expandHeight(BracketsUtility.dpToPx(262));
-                            getBracketsFragment(position).shrinkView(BracketsUtility.dpToPx(131));
+                    if (nextFragment != null && currentFragment != null) {
+                        if (nextFragment.getCurrentBracketSize() == nextFragment.getPreviousBracketSize()) {
+                            nextFragment.shrinkView(BracketsUtility.dpToPx(131));
+                            currentFragment.shrinkView(BracketsUtility.dpToPx(131));
+                        } else {
+                            int currentFragmentSize = nextFragment.getCurrentBracketSize();
+                            int previousFragmentSize = nextFragment.getPreviousBracketSize();
+                            if (currentFragmentSize != previousFragmentSize) {
+                                nextFragment.expandHeight(BracketsUtility.dpToPx(262));
+                                currentFragment.shrinkView(BracketsUtility.dpToPx(131));
+                            }
                         }
                     }
                 }
