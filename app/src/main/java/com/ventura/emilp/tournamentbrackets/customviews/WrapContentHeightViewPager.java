@@ -1,11 +1,9 @@
 package com.ventura.emilp.tournamentbrackets.customviews;
 
-import android.app.Activity;
 import android.content.Context;
 import androidx.viewpager.widget.ViewPager;
 
 import android.util.AttributeSet;
-import android.util.DisplayMetrics;
 import android.view.View;
 
 import com.ventura.emilp.tournamentbrackets.application.BracketsApplication;
