@@ -1,8 +1,6 @@
 package com.ventura.emilp.tournamentbrackets.utility;
 
-import android.util.DisplayMetrics;
-
-import com.ventura.emilp.tournamentbrackets.application.BracketsApplication;
+import android.content.res.Resources;
 
 /**
  * Created by Emil on 21/10/17.
@@ -10,8 +8,6 @@ import com.ventura.emilp.tournamentbrackets.application.BracketsApplication;
 
 public class BracketsUtility {
     public static int dpToPx(int dp) {
-        DisplayMetrics displayMetrics = BracketsApplication.getInstance().getBaseContext().getResources().getDisplayMetrics();
-        return Math.round(dp * (displayMetrics.xdpi / DisplayMetrics.DENSITY_DEFAULT));
+        return (int) (dp * Resources.getSystem().getDisplayMetrics().density);
     }
-
 }

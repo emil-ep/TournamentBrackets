@@ -2,14 +2,15 @@ package com.ventura.emilp.tournamentbrackets.adapter;
 
 import android.content.Context;
 import android.os.Handler;
+import android.os.Looper;
 import android.view.LayoutInflater;
-import android.view.View;
 import android.view.ViewGroup;
 
+import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.ventura.emilp.tournamentbrackets.Fragment.BracketsColomnFragment;
-import com.ventura.emilp.tournamentbrackets.R;
+import com.ventura.emilp.tournamentbrackets.databinding.LayoutCellBracketsBinding;
 import com.ventura.emilp.tournamentbrackets.model.MatchData;
 import com.ventura.emilp.tournamentbrackets.viewholder.BracketsCellViewHolder;
 
@@ -19,43 +20,33 @@ import java.util.ArrayList;
  * Created by Emil on 21/10/17.
  */
 
-public class BracketsCellAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>{
+public class BracketsCellAdapter extends RecyclerView.Adapter<BracketsCellViewHolder> {
 
-    private BracketsColomnFragment fragment;
-    private Context context;
+    private final BracketsColomnFragment fragment;
+    private final Context context;
     private ArrayList<MatchData> list;
-    private boolean handler;
+    private final Handler mainHandler = new Handler(Looper.getMainLooper());
 
     public BracketsCellAdapter(BracketsColomnFragment bracketsColomnFragment, Context context, ArrayList<MatchData> list) {
-
         this.fragment = bracketsColomnFragment;
         this.context = context;
         this.list = list;
     }
 
+    @NonNull
     @Override
-    public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-        LayoutInflater inflater = LayoutInflater.from(parent.getContext());
-        View view = inflater.inflate(R.layout.layout_cell_brackets, parent, false);
-        return new BracketsCellViewHolder(view);
+    public BracketsCellViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+        LayoutCellBracketsBinding binding = LayoutCellBracketsBinding.inflate(LayoutInflater.from(parent.getContext()), parent, false);
+        return new BracketsCellViewHolder(binding);
     }
 
     @Override
-    public void onBindViewHolder(RecyclerView.ViewHolder holder, int position) {
-        BracketsCellViewHolder viewHolder = null;
-        if (holder instanceof BracketsCellViewHolder){
-            viewHolder = (BracketsCellViewHolder) holder;
-            setFields(viewHolder, position);
-        }
+    public void onBindViewHolder(@NonNull BracketsCellViewHolder holder, int position) {
+        setFields(holder, position);
     }
 
     private void setFields(final BracketsCellViewHolder viewHolder, final int position) {
-        handler = new Handler().postDelayed(new Runnable() {
-            @Override
-            public void run() {
-                viewHolder.setAnimation(list.get(position).getHeight());
-            }
-        }, 100);
+        mainHandler.postDelayed(() -> viewHolder.setAnimation(list.get(position).getHeight()), 100);
 
         viewHolder.getTeamOneName().setText(list.get(position).getCompetitorOne().getName());
         viewHolder.getTeamTwoName().setText(list.get(position).getCompetitorTwo().getName());
@@ -65,7 +56,7 @@ public class BracketsCellAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
 
     @Override
     public int getItemCount() {
-        return this.list.size();
+        return this.list != null ? this.list.size() : 0;
     }
 
     public void setList(ArrayList<MatchData> colomnList) {

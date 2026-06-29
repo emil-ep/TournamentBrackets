@@ -1,15 +1,15 @@
 package com.ventura.emilp.tournamentbrackets.viewholder;
 
-import android.view.View;
 import android.view.animation.Animation;
 import android.view.animation.LinearInterpolator;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
+import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.ventura.emilp.tournamentbrackets.R;
 import com.ventura.emilp.tournamentbrackets.animation.SlideAnimation;
+import com.ventura.emilp.tournamentbrackets.databinding.LayoutCellBracketsBinding;
 
 /**
  * Created by Emil on 21/10/17.
@@ -17,44 +17,35 @@ import com.ventura.emilp.tournamentbrackets.animation.SlideAnimation;
 
 public class BracketsCellViewHolder extends RecyclerView.ViewHolder {
 
-    private TextView teamOneName;
-    private TextView teamTwoName;
-    private TextView teamOneScore;
-    private TextView teamTwoScore;
+    private final LayoutCellBracketsBinding binding;
     private Animation animation;
-    private RelativeLayout rootLayout;
 
-    public BracketsCellViewHolder(View itemView) {
-        super(itemView);
-        teamOneName = (TextView) itemView.findViewById(R.id.team_one_name);
-        teamTwoName = (TextView) itemView.findViewById(R.id.team_two_name);
-        teamOneScore = (TextView) itemView.findViewById(R.id.team_one_score);
-        teamTwoScore = (TextView) itemView.findViewById(R.id.team_two_score);
-        rootLayout = (RelativeLayout) itemView.findViewById(R.id.layout_root);
+    public BracketsCellViewHolder(@NonNull LayoutCellBracketsBinding binding) {
+        super(binding.getRoot());
+        this.binding = binding;
     }
 
-    public void setAnimation(int height){
-        animation = new SlideAnimation(rootLayout, rootLayout.getHeight(),
-                height);
+    public void setAnimation(int height) {
+        animation = new SlideAnimation(binding.layoutRoot, binding.layoutRoot.getHeight(), height);
         animation.setInterpolator(new LinearInterpolator());
         animation.setDuration(200);
-        rootLayout.setAnimation(animation);
-        rootLayout.startAnimation(animation);
+        binding.layoutRoot.setAnimation(animation);
+        binding.layoutRoot.startAnimation(animation);
     }
 
     public TextView getTeamTwoName() {
-        return teamTwoName;
+        return binding.teamTwoName;
     }
 
     public TextView getTeamOneScore() {
-        return teamOneScore;
+        return binding.teamOneScore;
     }
 
     public TextView getTeamTwoScore() {
-        return teamTwoScore;
+        return binding.teamTwoScore;
     }
 
     public TextView getTeamOneName() {
-        return teamOneName;
+        return binding.teamOneName;
     }
 }

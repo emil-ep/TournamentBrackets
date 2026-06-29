@@ -2,6 +2,7 @@ package com.ventura.emilp.tournamentbrackets.Fragment;
 
 import android.os.Bundle;
 
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.viewpager.widget.ViewPager;
@@ -10,9 +11,8 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import com.ventura.emilp.tournamentbrackets.R;
+import com.ventura.emilp.tournamentbrackets.databinding.FragmentBracktsBinding;
 import com.ventura.emilp.tournamentbrackets.adapter.BracketsSectionAdapter;
-import com.ventura.emilp.tournamentbrackets.customviews.WrapContentHeightViewPager;
 import com.ventura.emilp.tournamentbrackets.model.ColomnData;
 import com.ventura.emilp.tournamentbrackets.model.CompetitorData;
 import com.ventura.emilp.tournamentbrackets.model.MatchData;
@@ -28,7 +28,7 @@ import java.util.List;
 
 public class BracketsFragment extends Fragment implements ViewPager.OnPageChangeListener {
 
-    private WrapContentHeightViewPager viewPager;
+    private FragmentBracktsBinding binding;
     private BracketsSectionAdapter sectionAdapter;
     private ArrayList<ColomnData> sectionList;
     private int mNextSelectedScreen;
@@ -37,23 +37,30 @@ public class BracketsFragment extends Fragment implements ViewPager.OnPageChange
 
     @Nullable
     @Override
-    public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        return inflater.inflate(R.layout.fragment_brackts, container, false);
+    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+        binding = FragmentBracktsBinding.inflate(inflater, container, false);
+        return binding.getRoot();
     }
 
     @Override
-    public void onActivityCreated(@Nullable Bundle savedInstanceState) {
-        super.onActivityCreated(savedInstanceState);
-        initViews();
+    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
         setData();
         intialiseViewPagerAdapter();
     }
 
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        binding = null;
+    }
+
     private void setData() {
         sectionList = new ArrayList<>();
-        ArrayList<MatchData> Colomn1matchesList = new ArrayList<>();
+        ArrayList<MatchData> colomn1matchesList = new ArrayList<>();
         ArrayList<MatchData> colomn2MatchesList = new ArrayList<>();
         ArrayList<MatchData> colomn3MatchesList = new ArrayList<>();
+        
         CompetitorData competitorOne = new CompetitorData("Manchester United Fc", "2");
         CompetitorData competitorTwo = new CompetitorData("Arsenal", "1");
         CompetitorData competitorThree = new CompetitorData("Chelsea", "2");
@@ -62,51 +69,56 @@ public class BracketsFragment extends Fragment implements ViewPager.OnPageChange
         CompetitorData competitorSix = new CompetitorData("Liverpool", "4");
         CompetitorData competitorSeven = new CompetitorData("West ham ", "2");
         CompetitorData competitorEight = new CompetitorData("Bayern munich", "1");
-        MatchData matchData1 = new MatchData(competitorOne,competitorTwo);
+        
+        MatchData matchData1 = new MatchData(competitorOne, competitorTwo);
         MatchData matchData2 = new MatchData(competitorThree, competitorFour);
-        MatchData matchData3 = new MatchData(competitorFive,competitorSix);
+        MatchData matchData3 = new MatchData(competitorFive, competitorSix);
         MatchData matchData4 = new MatchData(competitorSeven, competitorEight);
-        Colomn1matchesList.add(matchData1);
-        Colomn1matchesList.add(matchData2);
-        Colomn1matchesList.add(matchData3);
-        Colomn1matchesList.add(matchData4);
-        ColomnData colomnData1 = new ColomnData(Colomn1matchesList);
+        
+        colomn1matchesList.add(matchData1);
+        colomn1matchesList.add(matchData2);
+        colomn1matchesList.add(matchData3);
+        colomn1matchesList.add(matchData4);
+        
+        ColomnData colomnData1 = new ColomnData(colomn1matchesList);
         sectionList.add(colomnData1);
+        
         CompetitorData competitorNine = new CompetitorData("Manchester United Fc", "2");
         CompetitorData competitorTen = new CompetitorData("Chelsea", "4");
         CompetitorData competitorEleven = new CompetitorData("Liverpool", "2");
         CompetitorData competitorTwelve = new CompetitorData("westham", "1");
-        MatchData matchData5 = new MatchData(competitorNine,competitorTen);
+        
+        MatchData matchData5 = new MatchData(competitorNine, competitorTen);
         MatchData matchData6 = new MatchData(competitorEleven, competitorTwelve);
+        
         colomn2MatchesList.add(matchData5);
         colomn2MatchesList.add(matchData6);
+        
         ColomnData colomnData2 = new ColomnData(colomn2MatchesList);
         sectionList.add(colomnData2);
+        
         CompetitorData competitorThirteen = new CompetitorData("Chelsea", "2");
         CompetitorData competitorForteen = new CompetitorData("Liverpool", "1");
+        
         MatchData matchData7 = new MatchData(competitorThirteen, competitorForteen);
+        
         colomn3MatchesList.add(matchData7);
+        
         ColomnData colomnData3 = new ColomnData(colomn3MatchesList);
         sectionList.add(colomnData3);
 
     }
 
     private void intialiseViewPagerAdapter() {
+        sectionAdapter = new BracketsSectionAdapter(getChildFragmentManager(), this.sectionList);
+        binding.container.setOffscreenPageLimit(10);
+        binding.container.setAdapter(sectionAdapter);
+        binding.container.setCurrentItem(0);
+        binding.container.setPageMargin(-200);
+        binding.container.setHorizontalFadingEdgeEnabled(true);
+        binding.container.setFadingEdgeLength(50);
 
-        sectionAdapter = new BracketsSectionAdapter(getChildFragmentManager(),this.sectionList);
-        viewPager.setOffscreenPageLimit(10);
-        viewPager.setAdapter(sectionAdapter);
-        viewPager.setCurrentItem(0);
-        viewPager.setPageMargin(-200);
-        viewPager.setHorizontalFadingEdgeEnabled(true);
-        viewPager.setFadingEdgeLength(50);
-
-        viewPager.addOnPageChangeListener(this);
-    }
-
-    private void initViews() {
-
-        viewPager = (WrapContentHeightViewPager) getView().findViewById(R.id.container);
+        binding.container.addOnPageChangeListener(this);
     }
 
     @Override
@@ -172,7 +184,7 @@ public class BracketsFragment extends Fragment implements ViewPager.OnPageChange
 
     @Override
     public void onPageScrollStateChanged(int state) {
-
+        mCurrentPagerState = state;
     }
 
     public BracketsColomnFragment getBracketsFragment(int position) {
