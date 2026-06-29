@@ -21,8 +21,8 @@ public class BracketsSectionAdapter  extends FragmentStatePagerAdapter {
 
 
     public BracketsSectionAdapter(FragmentManager fm, ArrayList<ColomnData> sectionList) {
-        super(fm);
-        this.sectionList =sectionList;
+        super(fm, BEHAVIOR_RESUME_ONLY_CURRENT_FRAGMENT);
+        this.sectionList = sectionList;
     }
 
     @Override
