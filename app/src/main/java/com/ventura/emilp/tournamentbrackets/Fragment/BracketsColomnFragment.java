@@ -115,17 +115,16 @@ public class BracketsColomnFragment extends Fragment {
     }
 
     private void initAdapter() {
+        if (binding == null || binding.rvScoreBoard == null) return;
         adapter = new BracketsCellAdapter(this, getContext(), list);
-        if (binding.rvScoreBoard != null) {
-            binding.rvScoreBoard.setHasFixedSize(true);
-            binding.rvScoreBoard.setNestedScrollingEnabled(false);
-            binding.rvScoreBoard.setAdapter(adapter);
-            binding.rvScoreBoard.smoothScrollToPosition(0);
-            final LinearLayoutManager layoutManager = new LinearLayoutManager(getActivity());
-            layoutManager.setOrientation(LinearLayoutManager.VERTICAL);
-            binding.rvScoreBoard.setLayoutManager(layoutManager);
-            binding.rvScoreBoard.setItemAnimator(new DefaultItemAnimator());
-        }
+        binding.rvScoreBoard.setHasFixedSize(true);
+        binding.rvScoreBoard.setNestedScrollingEnabled(false);
+        binding.rvScoreBoard.setAdapter(adapter);
+        binding.rvScoreBoard.smoothScrollToPosition(0);
+        final LinearLayoutManager layoutManager = new LinearLayoutManager(getActivity());
+        layoutManager.setOrientation(LinearLayoutManager.VERTICAL);
+        binding.rvScoreBoard.setLayoutManager(layoutManager);
+        binding.rvScoreBoard.setItemAnimator(new DefaultItemAnimator());
     }
 
     public int getCurrentBracketSize() {

@@ -14,6 +14,7 @@ import com.ventura.emilp.tournamentbrackets.databinding.LayoutCellBracketsBindin
 import com.ventura.emilp.tournamentbrackets.model.MatchData;
 import com.ventura.emilp.tournamentbrackets.viewholder.BracketsCellViewHolder;
 
+import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 
 /**
@@ -46,7 +47,15 @@ public class BracketsCellAdapter extends RecyclerView.Adapter<BracketsCellViewHo
     }
 
     private void setFields(final BracketsCellViewHolder viewHolder, final int position) {
-        mainHandler.postDelayed(() -> viewHolder.setAnimation(list.get(position).getHeight()), 100);
+        final int height = list.get(position).getHeight();
+        final WeakReference<BracketsCellViewHolder> weakViewHolder = new WeakReference<>(viewHolder);
+
+        mainHandler.postDelayed(() -> {
+            BracketsCellViewHolder holder = weakViewHolder.get();
+            if (holder != null && holder.getBindingAdapterPosition() != RecyclerView.NO_POSITION) {
+                holder.setAnimation(height);
+            }
+        }, 100);
 
         viewHolder.getTeamOneName().setText(list.get(position).getCompetitorOne().getName());
         viewHolder.getTeamTwoName().setText(list.get(position).getCompetitorTwo().getName());
@@ -62,5 +71,11 @@ public class BracketsCellAdapter extends RecyclerView.Adapter<BracketsCellViewHo
     public void setList(ArrayList<MatchData> colomnList) {
         this.list = colomnList;
         notifyDataSetChanged();
+    }
+
+    @Override
+    public void onDetachedFromRecyclerView(@NonNull RecyclerView recyclerView) {
+        super.onDetachedFromRecyclerView(recyclerView);
+        mainHandler.removeCallbacksAndMessages(null);
     }
 }
