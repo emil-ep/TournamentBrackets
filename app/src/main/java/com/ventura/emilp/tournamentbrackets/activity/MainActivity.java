@@ -52,6 +52,7 @@ public class MainActivity extends AppCompatActivity {
             int height = windowMetrics.getBounds().height() - insets.top - insets.bottom;
             BracketsApplication.getInstance().setScreenHeight(height);
         } else {
+            // Support for devices below API 30 (minimum SDK is 24)
             DisplayMetrics displayMetrics = new DisplayMetrics();
             getWindowManager().getDefaultDisplay().getMetrics(displayMetrics);
             int height = displayMetrics.heightPixels;

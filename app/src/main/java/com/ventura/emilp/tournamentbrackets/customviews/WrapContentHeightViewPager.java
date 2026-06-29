@@ -38,6 +38,7 @@ public class WrapContentHeightViewPager extends ViewPager {
         }
 
         int screenHeight = BracketsApplication.getInstance().getScreenHeight();
+        if (screenHeight <= 0) screenHeight = getMeasuredHeight();
         if (screenHeight > height)
             height = screenHeight;
 
