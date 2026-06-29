@@ -1,3 +1,14 @@
 <resources>
     <string name="app_name">WC 2026 Brackets</string>
+    <string name="home_subtitle">FIFA World Cup 2026</string>
+    <string name="home_group_standings">Group Standings</string>
+    <string name="home_brackets">Knockout Brackets</string>
+    <string name="col_mp">MP</string>
+    <string name="col_w">W</string>
+    <string name="col_d">D</string>
+    <string name="col_l">L</string>
+    <string name="col_gf">GF</string>
+    <string name="col_ga">GA</string>
+    <string name="col_gd">GD</string>
+    <string name="col_pts">PTS</string>
 </resources>
