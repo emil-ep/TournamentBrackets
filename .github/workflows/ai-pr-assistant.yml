@@ -1,0 +1,271 @@
+name: AI PR Assistant
+
+on:
+  pull_request:
+    types: [opened]
+  issue_comment:
+    types: [created]
+
+permissions:
+  contents: read
+  pull-requests: write
+  issues: write
+
+jobs:
+  # Job 1: Auto-generate PR description when PR is opened (if empty)
+  generate-description:
+    runs-on: ubuntu-latest
+    if: github.event_name == 'pull_request' && github.event.action == 'opened'
+    
+    steps:
+      - name: Check if PR has description
+        id: check_description
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const pr = context.payload.pull_request;
+            const hasDescription = pr.body && pr.body.trim().length > 0;
+            core.setOutput('has_description', hasDescription ? 'true' : 'false');
+            core.setOutput('pr_number', pr.number);
+            console.log(`PR #${pr.number}: has_description = ${hasDescription ? 'true' : 'false'}`);
+            console.log(`PR body: "${pr.body}"`);
+      
+      - name: Detect and Validate AI Provider
+        if: steps.check_description.outputs.has_description != 'true'
+        id: detect_provider
+        env:
+          AI_PROVIDER: ${{ secrets.AI_PROVIDER }}
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          GROK_API_KEY: ${{ secrets.GROK_API_KEY }}
+          BOB_API_ENDPOINT: ${{ secrets.BOB_API_ENDPOINT }}
+        run: |
+          echo "Detecting AI provider configuration..."
+          
+          # If AI_PROVIDER is explicitly set, use it
+          if [ -n "${AI_PROVIDER}" ]; then
+            DETECTED_PROVIDER="${AI_PROVIDER}"
+            echo "Using explicitly configured provider: ${DETECTED_PROVIDER}"
+          else
+            # Auto-detect based on available secrets
+            echo "No AI_PROVIDER set, auto-detecting based on configured secrets..."
+            
+            if [ -n "${BOB_API_ENDPOINT}" ]; then
+              DETECTED_PROVIDER="bob"
+              echo "✅ Detected Bob configuration"
+            elif [ -n "${OPENAI_API_KEY}" ]; then
+              DETECTED_PROVIDER="chatgpt"
+              echo "✅ Detected ChatGPT configuration"
+            elif [ -n "${ANTHROPIC_API_KEY}" ]; then
+              DETECTED_PROVIDER="claude"
+              echo "✅ Detected Claude configuration"
+            elif [ -n "${GROK_API_KEY}" ]; then
+              DETECTED_PROVIDER="grok"
+              echo "✅ Detected Grok configuration"
+            else
+              echo "::error::No AI provider configured. Please add one of the following secrets:"
+              echo "::notice::• BOB_API_ENDPOINT (for Bob)"
+              echo "::notice::• OPENAI_API_KEY (for ChatGPT)"
+              echo "::notice::• ANTHROPIC_API_KEY (for Claude)"
+              echo "::notice::• GROK_API_KEY (for Grok)"
+              echo "::notice::Go to Settings → Secrets and variables → Actions to add secrets"
+              exit 1
+            fi
+          fi
+          
+          # Validate the detected/configured provider has required secrets
+          case "${DETECTED_PROVIDER}" in
+            bob)
+              if [ -z "${BOB_API_ENDPOINT}" ]; then
+                echo "::error::AI_PROVIDER is set to 'bob' but BOB_API_ENDPOINT is not configured"
+                exit 1
+              fi
+              echo "✅ Using Bob"
+              ;;
+            chatgpt)
+              if [ -z "${OPENAI_API_KEY}" ]; then
+                echo "::error::AI_PROVIDER is set to 'chatgpt' but OPENAI_API_KEY is not configured"
+                exit 1
+              fi
+              echo "✅ Using ChatGPT"
+              ;;
+            claude)
+              if [ -z "${ANTHROPIC_API_KEY}" ]; then
+                echo "::error::AI_PROVIDER is set to 'claude' but ANTHROPIC_API_KEY is not configured"
+                exit 1
+              fi
+              echo "✅ Using Claude"
+              ;;
+            grok)
+              if [ -z "${GROK_API_KEY}" ]; then
+                echo "::error::AI_PROVIDER is set to 'grok' but GROK_API_KEY is not configured"
+                exit 1
+              fi
+              echo "✅ Using Grok"
+              ;;
+            *)
+              echo "::error::Unknown AI_PROVIDER: ${DETECTED_PROVIDER}. Must be one of: bob, chatgpt, claude, grok"
+              exit 1
+              ;;
+          esac
+          
+          # Export for use in subsequent steps
+          echo "DETECTED_PROVIDER=${DETECTED_PROVIDER}" >> $GITHUB_ENV
+          echo "Final provider: ${DETECTED_PROVIDER}"
+      
+      - name: Checkout AI PR Reviewer
+        if: steps.check_description.outputs.has_description != 'true'
+        uses: actions/checkout@v4
+        with:
+          repository: 'emil-ep/pr-reviewer'  # Replace with your repo
+          path: 'ai-reviewer'
+      
+      - name: Setup Node.js
+        if: steps.check_description.outputs.has_description != 'true'
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+          cache: 'npm'
+          cache-dependency-path: 'ai-reviewer/package-lock.json'
+      
+      - name: Install dependencies
+        if: steps.check_description.outputs.has_description != 'true'
+        working-directory: ai-reviewer
+        run: npm ci
+      
+      - name: Build project
+        if: steps.check_description.outputs.has_description != 'true'
+        working-directory: ai-reviewer
+        run: npm run build
+      
+      - name: Generate PR Description
+        if: steps.check_description.outputs.has_description != 'true'
+        working-directory: ai-reviewer
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          AI_PROVIDER: ${{ env.DETECTED_PROVIDER }}
+          
+          # OpenAI (ChatGPT)
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+          OPENAI_MODEL: ${{ secrets.OPENAI_MODEL }}
+          
+          # Anthropic (Claude)
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          ANTHROPIC_MODEL: ${{ secrets.ANTHROPIC_MODEL }}
+          
+          # Grok
+          GROK_API_KEY: ${{ secrets.GROK_API_KEY }}
+          GROK_MODEL: ${{ secrets.GROK_MODEL }}
+          
+          # Bob (Custom)
+          BOB_API_ENDPOINT: ${{ secrets.BOB_API_ENDPOINT }}
+          
+          # Repository info
+          REPO_OWNER: ${{ github.repository_owner }}
+          REPO_NAME: ${{ github.event.repository.name }}
+          PR_NUMBER: ${{ steps.check_description.outputs.pr_number }}
+        run: |
+          echo "📝 Generating PR description for #${PR_NUMBER}"
+          echo "Using AI Provider: ${AI_PROVIDER:-chatgpt}"
+          node dist/generate-description.js
+      
+      - name: Comment on PR (on failure)
+        if: failure() && steps.check_description.outputs.has_description != 'true'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const aiProvider = process.env.DETECTED_PROVIDER || process.env.AI_PROVIDER || 'unknown';
+            let setupInstructions = '';
+            
+            switch(aiProvider) {
+              case 'chatgpt':
+                setupInstructions = '1. Go to repository **Settings** → **Secrets and variables** → **Actions**\\n2. Add secret: **OPENAI_API_KEY** with your OpenAI API key (starts with sk-)';
+                break;
+              case 'claude':
+                setupInstructions = '1. Go to repository **Settings** → **Secrets and variables** → **Actions**\\n2. Add secret: **ANTHROPIC_API_KEY** with your Anthropic API key (starts with sk-ant-)';
+                break;
+              case 'grok':
+                setupInstructions = '1. Go to repository **Settings** → **Secrets and variables** → **Actions**\\n2. Add secret: **GROK_API_KEY** with your Grok API key';
+                break;
+              case 'bob':
+                setupInstructions = '1. Go to repository **Settings** → **Secrets and variables** → **Actions**\\n2. Add secret: **BOB_API_ENDPOINT** with your Bob service URL';
+                break;
+            }
+            
+            const body = '⚠️ **Failed to auto-generate PR description**\n\n' +
+              '**Reason**: AI provider configuration is missing or invalid.\n\n' +
+              '**Current AI Provider**: `' + aiProvider + '`\n\n' +
+              '**To fix this**:\n' +
+              setupInstructions + '\n\n' +
+              '**Alternative**: Add a PR description manually.\n\n' +
+              '[View workflow logs](' + context.payload.repository.html_url + '/actions/runs/' + context.runId + ') for more details.';
+            
+            github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: body
+            });
+        env:
+          DETECTED_PROVIDER: ${{ env.DETECTED_PROVIDER }}
+          AI_PROVIDER: ${{ secrets.AI_PROVIDER }}
+
+  # Job 2: Review PR when user comments /review
+  review:
+    runs-on: ubuntu-latest
+    if: |
+      github.event_name == 'issue_comment' && 
+      github.event.issue.pull_request &&
+      contains(github.event.comment.body, '/review')
+    
+    steps:
+      - name: Checkout AI PR Reviewer
+        uses: actions/checkout@v4
+        with:
+          repository: 'emil-ep/pr-reviewer'  # Replace with your repo
+          path: 'ai-reviewer'
+      
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+          cache: 'npm'
+          cache-dependency-path: 'ai-reviewer/package-lock.json'
+      
+      - name: Install dependencies
+        working-directory: ai-reviewer
+        run: npm ci
+      
+      - name: Build project
+        working-directory: ai-reviewer
+        run: npm run build
+      
+      - name: Run AI PR Review
+        working-directory: ai-reviewer
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          PR_NUMBER: ${{ github.event.issue.number }}
+          REPO_OWNER: ${{ github.repository_owner }}
+          REPO_NAME: ${{ github.event.repository.name }}
+          
+          # AI Provider Configuration
+          AI_PROVIDER: ${{ secrets.AI_PROVIDER }}
+          
+          # Bob Configuration
+          BOB_API_ENDPOINT: ${{ secrets.BOB_API_ENDPOINT }}
+          
+          # ChatGPT Configuration
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+          OPENAI_MODEL: ${{ secrets.OPENAI_MODEL }}
+          
+          # Claude Configuration
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          ANTHROPIC_MODEL: ${{ secrets.ANTHROPIC_MODEL }}
+          
+          # Grok Configuration
+          GROK_API_KEY: ${{ secrets.GROK_API_KEY }}
+          GROK_MODEL: ${{ secrets.GROK_MODEL }}
+        run: |
+          echo "🤖 Reviewing PR #${PR_NUMBER} in ${REPO_OWNER}/${REPO_NAME}"
+          echo "Using AI Provider: ${AI_PROVIDER:-bob}"
+          node dist/index.js
