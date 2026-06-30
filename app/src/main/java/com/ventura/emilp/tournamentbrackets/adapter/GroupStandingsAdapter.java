@@ -9,9 +9,11 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
+import androidx.recyclerview.widget.DiffUtil;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.ventura.emilp.tournamentbrackets.R;
 import com.ventura.emilp.tournamentbrackets.model.GroupTeamDisplayItem;
 
@@ -22,10 +24,27 @@ public class GroupStandingsAdapter extends RecyclerView.Adapter<GroupStandingsAd
 
     private final List<GroupData> groupList = new ArrayList<>();
 
-    public void setData(List<GroupData> data) {
+    public void setData(List<GroupData> newData) {
+        DiffUtil.DiffResult result = DiffUtil.calculateDiff(new DiffUtil.Callback() {
+            @Override
+            public int getOldListSize() { return groupList.size(); }
+
+            @Override
+            public int getNewListSize() { return newData.size(); }
+
+            @Override
+            public boolean areItemsTheSame(int oldPos, int newPos) {
+                return groupList.get(oldPos).groupName.equals(newData.get(newPos).groupName);
+            }
+
+            @Override
+            public boolean areContentsTheSame(int oldPos, int newPos) {
+                return groupList.get(oldPos).equals(newData.get(newPos));
+            }
+        });
         groupList.clear();
-        groupList.addAll(data);
-        notifyDataSetChanged();
+        groupList.addAll(newData);
+        result.dispatchUpdatesTo(this);
     }
 
     @NonNull
@@ -79,6 +98,9 @@ public class GroupStandingsAdapter extends RecyclerView.Adapter<GroupStandingsAd
 
                 Glide.with(context)
                         .load(item.getFlagUrl())
+                        .placeholder(R.drawable.flag_placeholder)
+                        .error(R.drawable.flag_placeholder)
+                        .diskCacheStrategy(DiskCacheStrategy.ALL)
                         .into(ivFlag);
 
                 tvName.setText(item.getName());
@@ -104,6 +126,19 @@ public class GroupStandingsAdapter extends RecyclerView.Adapter<GroupStandingsAd
         public GroupData(String groupName, List<GroupTeamDisplayItem> teams) {
             this.groupName = groupName;
             this.teams = teams;
+        }
+
+        @Override
+        public boolean equals(Object o) {
+            if (this == o) return true;
+            if (!(o instanceof GroupData)) return false;
+            GroupData other = (GroupData) o;
+            if (!groupName.equals(other.groupName)) return false;
+            if (teams.size() != other.teams.size()) return false;
+            for (int i = 0; i < teams.size(); i++) {
+                if (!teams.get(i).equals(other.teams.get(i))) return false;
+            }
+            return true;
         }
     }
 }

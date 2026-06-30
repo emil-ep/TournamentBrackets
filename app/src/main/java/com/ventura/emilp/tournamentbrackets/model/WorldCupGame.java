@@ -53,11 +53,11 @@ public class WorldCupGame {
     }
 
     public String getHomeScore() {
-        return isFinished() ? homeScore : null;
+        return isFinished() ? homeScore : "-";
     }
 
     public String getAwayScore() {
-        return isFinished() ? awayScore : null;
+        return isFinished() ? awayScore : "-";
     }
 
     public String getType() {

@@ -36,4 +36,18 @@ public class GroupTeamDisplayItem {
     public String getGa() { return ga; }
     public String getGd() { return gd; }
     public String getPts() { return pts; }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof GroupTeamDisplayItem)) return false;
+        GroupTeamDisplayItem other = (GroupTeamDisplayItem) o;
+        return eq(name, other.name) && eq(pts, other.pts) && eq(mp, other.mp)
+                && eq(w, other.w) && eq(d, other.d) && eq(l, other.l)
+                && eq(gf, other.gf) && eq(ga, other.ga) && eq(gd, other.gd);
+    }
+
+    private static boolean eq(String a, String b) {
+        return a != null ? a.equals(b) : b == null;
+    }
 }
