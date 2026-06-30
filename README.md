@@ -24,7 +24,10 @@ Built with **[TournamentBracketLib](https://github.com/Emil333/TournamentBracket
 
 | Home | Brackets | Group Standings |
 |------|----------|-----------------|
-| ![Home](https://via.placeholder.com/250x500/1c222e/fff?text=Home) | ![Brackets](https://via.placeholder.com/250x500/1c222e/fff?text=Brackets) | ![Standings](https://via.placeholder.com/250x500/1c222e/fff?text=Standings) |
+| ![Home](<img width="1080" height="2424" alt="Screenshot_20260630_171300" src="https://github.com/user-attachments/assets/c483a1da-e034-42ed-b852-b9689ccd64ee" />
+) | ![Brackets](<img width="1080" height="2424" alt="Screenshot_20260630_174237" src="https://github.com/user-attachments/assets/dd591390-0e49-4811-a8ba-222a2cb4ccdf" />
+) | ![Standings](<img width="1080" height="2424" alt="Screenshot_20260630_174304" src="https://github.com/user-attachments/assets/2d651142-fa40-4234-a7f7-b87a220ce844" />
+) |
 
 > *Replace these placeholders with actual screenshots from your device.*
 
