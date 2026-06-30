@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="36dp"
+    android:orientation="horizontal"
+    android:gravity="center_vertical">
+
+    <ImageView
+        android:id="@+id/iv_flag"
+        android:layout_width="24dp"
+        android:layout_height="16dp"
+        android:scaleType="fitXY" />
+
+    <TextView
+        android:id="@+id/tv_name"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:layout_marginStart="8dp"
+        android:textColor="#d0d8e8"
+        android:textSize="13sp"
+        android:singleLine="true"
+        android:ellipsize="end" />
+
+    <TextView
+        android:id="@+id/tv_mp"
+        android:layout_width="28dp"
+        android:layout_height="wrap_content"
+        android:textColor="#c0c8d8"
+        android:textSize="13sp"
+        android:gravity="center" />
+
+    <TextView
+        android:id="@+id/tv_w"
+        android:layout_width="28dp"
+        android:layout_height="wrap_content"
+        android:textColor="#c0c8d8"
+        android:textSize="13sp"
+        android:gravity="center" />
+
+    <TextView
+        android:id="@+id/tv_d"
+        android:layout_width="28dp"
+        android:layout_height="wrap_content"
+        android:textColor="#c0c8d8"
+        android:textSize="13sp"
+        android:gravity="center" />
+
+    <TextView
+        android:id="@+id/tv_l"
+        android:layout_width="28dp"
+        android:layout_height="wrap_content"
+        android:textColor="#c0c8d8"
+        android:textSize="13sp"
+        android:gravity="center" />
+
+    <TextView
+        android:id="@+id/tv_gf"
+        android:layout_width="28dp"
+        android:layout_height="wrap_content"
+        android:textColor="#c0c8d8"
+        android:textSize="13sp"
+        android:gravity="center" />
+
+    <TextView
+        android:id="@+id/tv_ga"
+        android:layout_width="28dp"
+        android:layout_height="wrap_content"
+        android:textColor="#c0c8d8"
+        android:textSize="13sp"
+        android:gravity="center" />
+
+    <TextView
+        android:id="@+id/tv_gd"
+        android:layout_width="28dp"
+        android:layout_height="wrap_content"
+        android:textColor="#c0c8d8"
+        android:textSize="13sp"
+        android:gravity="center" />
+
+    <TextView
+        android:id="@+id/tv_pts"
+        android:layout_width="32dp"
+        android:layout_height="wrap_content"
+        android:textColor="#f5a623"
+        android:textSize="13sp"
+        android:textStyle="bold"
+        android:gravity="center" />
+
+</LinearLayout>

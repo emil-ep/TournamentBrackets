@@ -1,0 +1,128 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginBottom="16dp"
+    app:cardBackgroundColor="#262e40"
+    app:cardCornerRadius="10dp"
+    app:cardElevation="2dp">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="12dp">
+
+        <!-- Group title -->
+        <TextView
+            android:id="@+id/tv_group_name"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textColor="#ffffff"
+            android:textSize="15sp"
+            android:textStyle="bold"
+            android:layout_marginBottom="10dp" />
+
+        <!-- Column headers -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_marginBottom="4dp">
+
+            <ImageView
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:visibility="invisible" />
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text=""
+                android:layout_marginStart="8dp" />
+
+            <TextView
+                android:layout_width="28dp"
+                android:layout_height="wrap_content"
+                android:text="@string/col_mp"
+                android:textColor="#8a93a8"
+                android:textSize="11sp"
+                android:gravity="center" />
+
+            <TextView
+                android:layout_width="28dp"
+                android:layout_height="wrap_content"
+                android:text="@string/col_w"
+                android:textColor="#8a93a8"
+                android:textSize="11sp"
+                android:gravity="center" />
+
+            <TextView
+                android:layout_width="28dp"
+                android:layout_height="wrap_content"
+                android:text="@string/col_d"
+                android:textColor="#8a93a8"
+                android:textSize="11sp"
+                android:gravity="center" />
+
+            <TextView
+                android:layout_width="28dp"
+                android:layout_height="wrap_content"
+                android:text="@string/col_l"
+                android:textColor="#8a93a8"
+                android:textSize="11sp"
+                android:gravity="center" />
+
+            <TextView
+                android:layout_width="28dp"
+                android:layout_height="wrap_content"
+                android:text="@string/col_gf"
+                android:textColor="#8a93a8"
+                android:textSize="11sp"
+                android:gravity="center" />
+
+            <TextView
+                android:layout_width="28dp"
+                android:layout_height="wrap_content"
+                android:text="@string/col_ga"
+                android:textColor="#8a93a8"
+                android:textSize="11sp"
+                android:gravity="center" />
+
+            <TextView
+                android:layout_width="28dp"
+                android:layout_height="wrap_content"
+                android:text="@string/col_gd"
+                android:textColor="#8a93a8"
+                android:textSize="11sp"
+                android:gravity="center" />
+
+            <TextView
+                android:layout_width="32dp"
+                android:layout_height="wrap_content"
+                android:text="@string/col_pts"
+                android:textColor="#f5a623"
+                android:textSize="11sp"
+                android:textStyle="bold"
+                android:gravity="center" />
+
+        </LinearLayout>
+
+        <!-- Divider -->
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:background="#3a4258"
+            android:layout_marginBottom="4dp" />
+
+        <!-- Team rows container -->
+        <LinearLayout
+            android:id="@+id/ll_teams_container"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical" />
+
+    </LinearLayout>
+</androidx.cardview.widget.CardView>
