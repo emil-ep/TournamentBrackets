@@ -30,6 +30,12 @@ public class WorldCupGame {
     @SerializedName("finished")
     private String finished;
 
+    @SerializedName("home_team_id")
+    private String homeTeamId;
+
+    @SerializedName("away_team_id")
+    private String awayTeamId;
+
     public String getId() {
         return id;
     }
@@ -56,5 +62,13 @@ public class WorldCupGame {
 
     public String getType() {
         return type;
+    }
+
+    public String getHomeTeamId() {
+        return homeTeamId;
+    }
+
+    public String getAwayTeamId() {
+        return awayTeamId;
     }
 }
