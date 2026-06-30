@@ -24,12 +24,10 @@ import com.ventura.emilp.tournamentbrackets.model.WorldCupResponse;
 import com.ventura.emilp.tournamentbrackets.network.RetrofitClient;
 
 import java.util.ArrayList;
-import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.atomic.AtomicInteger;
-import java.util.concurrent.atomic.AtomicReference;
 
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -40,9 +38,10 @@ public class MainActivity extends AppCompatActivity {
     private ActivityMainBinding binding;
     private static final String TAG = "MainActivity";
 
-    private final AtomicReference<List<WorldCupGame>> gamesRef = new AtomicReference<>();
-    private final AtomicReference<Map<String, Team>> teamsMapRef = new AtomicReference<>();
-    private final AtomicInteger pendingCalls = new AtomicInteger(2);
+    // Results from parallel API calls (accessed only on main thread)
+    private List<WorldCupGame> games;
+    private Map<String, Team> teamsMap;
+    private int pendingCalls = 2;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -66,18 +65,18 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onResponse(Call<WorldCupResponse> call, Response<WorldCupResponse> response) {
                 if (response.isSuccessful() && response.body() != null) {
-                    gamesRef.set(response.body().getGames());
-                    Log.d(TAG, "Fetched " + response.body().getGames().size() + " games");
+                    games = response.body().getGames();
+                    Log.d(TAG, "Fetched " + games.size() + " games");
                 } else {
                     Log.e(TAG, "Failed to fetch games: " + response.code());
                 }
-                checkBothReady();
+                onCallComplete();
             }
 
             @Override
             public void onFailure(Call<WorldCupResponse> call, Throwable t) {
                 Log.e(TAG, "Error fetching games", t);
-                checkBothReady();
+                onCallComplete();
             }
         });
     }
@@ -87,81 +86,84 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onResponse(Call<TeamsResponse> call, Response<TeamsResponse> response) {
                 if (response.isSuccessful() && response.body() != null) {
-                    Map<String, Team> map = new HashMap<>();
+                    teamsMap = new HashMap<>();
                     for (Team t : response.body().getTeams()) {
-                        map.put(t.getId(), t);
+                        teamsMap.put(t.getId(), t);
                     }
-                    teamsMapRef.set(map);
-                    Log.d(TAG, "Fetched " + map.size() + " teams");
+                    Log.d(TAG, "Fetched " + teamsMap.size() + " teams");
                 } else {
                     Log.e(TAG, "Failed to fetch teams: " + response.code());
                 }
-                checkBothReady();
+                onCallComplete();
             }
 
             @Override
             public void onFailure(Call<TeamsResponse> call, Throwable t) {
                 Log.e(TAG, "Error fetching teams", t);
-                checkBothReady();
+                onCallComplete();
             }
         });
     }
 
-    private void checkBothReady() {
-        if (pendingCalls.decrementAndGet() != 0) return;
+    /**
+     * Called on the main thread after each Retrofit callback completes.
+     * Retrofit enqueue delivers callbacks on the main thread, so no
+     * synchronization is needed.
+     */
+    private void onCallComplete() {
+        pendingCalls--;
+        if (pendingCalls != 0) return;
 
-        List<WorldCupGame> games = gamesRef.get();
-        Map<String, Team> teamsMap = teamsMapRef.get();
-
-        runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                binding.pBar.setVisibility(android.view.View.GONE);
-                if (games == null) {
-                    Toast.makeText(MainActivity.this, "Failed to load games", Toast.LENGTH_SHORT).show();
-                    return;
-                }
-                binding.bracketView.setVisibility(android.view.View.VISIBLE);
-                processGames(games, teamsMap);
-            }
-        });
+        binding.pBar.setVisibility(android.view.View.GONE);
+        if (games == null) {
+            Toast.makeText(this, "Failed to load games", Toast.LENGTH_SHORT).show();
+            return;
+        }
+        binding.bracketView.setVisibility(android.view.View.VISIBLE);
+        processGames(games, teamsMap);
     }
+
+    private static final String[] KNOCKOUT_ROUNDS = {"r32", "r16", "qf", "sf", "final"};
 
     private void processGames(List<WorldCupGame> games, Map<String, Team> teamsMap) {
-        List<ColomnData> colomnDataList = new ArrayList<>();
+        // Group games by type
+        Map<String, List<WorldCupGame>> gamesByType = new HashMap<>();
+        for (WorldCupGame game : games) {
+            String type = game.getType();
+            if (type == null) continue;
+            List<WorldCupGame> list = gamesByType.get(type);
+            if (list == null) {
+                list = new ArrayList<>();
+                gamesByType.put(type, list);
+            }
+            list.add(game);
+        }
 
-        colomnDataList.add(getColomnDataForType(games, teamsMap, "r32", Arrays.asList("74", "77", "73", "75", "83", "84", "81", "82", "76", "78", "79", "80", "86", "88", "85", "87")));
-        colomnDataList.add(getColomnDataForType(games, teamsMap, "r16", Arrays.asList("89", "90", "93", "94", "91", "92", "95", "96")));
-        colomnDataList.add(getColomnDataForType(games, teamsMap, "qf", Arrays.asList("97", "98", "99", "100")));
-        colomnDataList.add(getColomnDataForType(games, teamsMap, "sf", Arrays.asList("101", "102")));
-        colomnDataList.add(getColomnDataForType(games, teamsMap, "final", Arrays.asList("104")));
+        // Sort each round's games by ID ascending
+        for (List<WorldCupGame> list : gamesByType.values()) {
+            Collections.sort(list, (a, b) -> Integer.compare(parseId(a.getId()), parseId(b.getId())));
+        }
+
+        // Build bracket columns in round order
+        List<ColomnData> colomnDataList = new ArrayList<>();
+        for (String round : KNOCKOUT_ROUNDS) {
+            List<WorldCupGame> roundGames = gamesByType.get(round);
+            if (roundGames != null && !roundGames.isEmpty()) {
+                List<MatchData> matches = new ArrayList<>();
+                for (WorldCupGame game : roundGames) {
+                    matches.add(createMatchData(game, teamsMap));
+                }
+                colomnDataList.add(new ColomnData(matches));
+            }
+        }
 
         Log.d(TAG, "Setting brackets data with " + colomnDataList.size() + " columns");
         binding.bracketView.setBracketsData(colomnDataList);
     }
 
-    private ColomnData getColomnDataForType(List<WorldCupGame> games, Map<String, Team> teamsMap, String type, List<String> orderedIds) {
-        List<MatchData> matches = new ArrayList<>();
-
-        for (String id : orderedIds) {
-            for (WorldCupGame game : games) {
-                if (id.equals(game.getId())) {
-                    matches.add(createMatchData(game, teamsMap));
-                    break;
-                }
-            }
-        }
-
-        // Fallback if some games are missing
-        if (matches.isEmpty()) {
-            for (WorldCupGame game : games) {
-                if (type.equals(game.getType())) {
-                    matches.add(createMatchData(game, teamsMap));
-                }
-            }
-        }
-
-        return new ColomnData(matches);
+    private static int parseId(String id) {
+        if (id == null) return 0;
+        try { return Integer.parseInt(id); } catch (NumberFormatException e) { return 0; }
     }
 
     private MatchData createMatchData(WorldCupGame game, Map<String, Team> teamsMap) {

@@ -23,8 +23,6 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.atomic.AtomicInteger;
-import java.util.concurrent.atomic.AtomicReference;
 
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -37,10 +35,11 @@ public class GroupStandingsActivity extends AppCompatActivity {
     private ActivityGroupStandingsBinding binding;
     private GroupStandingsAdapter adapter;
 
-    // Holds results from the two parallel API calls
-    private final AtomicReference<List<Group>> groupsRef = new AtomicReference<>();
-    private final AtomicReference<Map<String, Team>> teamsMapRef = new AtomicReference<>();
-    private final AtomicInteger pendingCalls = new AtomicInteger(2);
+    // Results from parallel API calls (accessed only on main thread)
+    private List<Group> groups;
+    private Map<String, Team> teamsMap;
+    private int pendingCalls;
+    private String errorMessage;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -57,11 +56,12 @@ public class GroupStandingsActivity extends AppCompatActivity {
         binding.recyclerGroups.setLayoutManager(new LinearLayoutManager(this));
         binding.recyclerGroups.setAdapter(adapter);
 
+        binding.swipeRefresh.setOnRefreshListener(this::loadData);
+
         binding.pBar.setVisibility(android.view.View.VISIBLE);
         binding.recyclerGroups.setVisibility(android.view.View.GONE);
 
-        fetchGroups();
-        fetchTeams();
+        loadData();
     }
 
     @Override
@@ -70,23 +70,34 @@ public class GroupStandingsActivity extends AppCompatActivity {
         return true;
     }
 
+    private void loadData() {
+        groups = null;
+        teamsMap = null;
+        errorMessage = null;
+        pendingCalls = 2;
+        fetchGroups();
+        fetchTeams();
+    }
+
     private void fetchGroups() {
         RetrofitClient.getApi().getGroups().enqueue(new Callback<GroupsResponse>() {
             @Override
             public void onResponse(Call<GroupsResponse> call, Response<GroupsResponse> response) {
                 if (response.isSuccessful() && response.body() != null) {
-                    groupsRef.set(response.body().getGroups());
-                    Log.d(TAG, "Groups fetched: " + response.body().getGroups().size());
+                    groups = response.body().getGroups();
+                    Log.d(TAG, "Groups fetched: " + groups.size());
                 } else {
-                    Log.e(TAG, "Groups call failed: " + response.code());
+                    errorMessage = "Failed to load groups (HTTP " + response.code() + ")";
+                    Log.e(TAG, errorMessage);
                 }
-                checkBothReady();
+                onCallComplete();
             }
 
             @Override
             public void onFailure(Call<GroupsResponse> call, Throwable t) {
-                Log.e(TAG, "Groups fetch error", t);
-                checkBothReady();
+                errorMessage = "Network error loading groups: " + t.getMessage();
+                Log.e(TAG, errorMessage, t);
+                onCallComplete();
             }
         });
     }
@@ -96,38 +107,42 @@ public class GroupStandingsActivity extends AppCompatActivity {
             @Override
             public void onResponse(Call<TeamsResponse> call, Response<TeamsResponse> response) {
                 if (response.isSuccessful() && response.body() != null) {
-                    Map<String, Team> map = new HashMap<>();
+                    teamsMap = new HashMap<>();
                     for (Team t : response.body().getTeams()) {
-                        map.put(t.getId(), t);
+                        teamsMap.put(t.getId(), t);
                     }
-                    teamsMapRef.set(map);
-                    Log.d(TAG, "Teams fetched: " + map.size());
+                    Log.d(TAG, "Teams fetched: " + teamsMap.size());
                 } else {
-                    Log.e(TAG, "Teams call failed: " + response.code());
+                    errorMessage = "Failed to load teams (HTTP " + response.code() + ")";
+                    Log.e(TAG, errorMessage);
                 }
-                checkBothReady();
+                onCallComplete();
             }
 
             @Override
             public void onFailure(Call<TeamsResponse> call, Throwable t) {
-                Log.e(TAG, "Teams fetch error", t);
-                checkBothReady();
+                errorMessage = "Network error loading teams: " + t.getMessage();
+                Log.e(TAG, errorMessage, t);
+                onCallComplete();
             }
         });
     }
 
-    /** Called after each completed API call; builds the UI when both are done. */
-    private void checkBothReady() {
-        if (pendingCalls.decrementAndGet() != 0) return;
+    /**
+     * Called on the main thread after each Retrofit callback completes.
+     * Retrofit enqueue delivers callbacks on the main thread, so no
+     * synchronization is needed.
+     */
+    private void onCallComplete() {
+        pendingCalls--;
+        if (pendingCalls != 0) return;
 
-        List<Group> groups = groupsRef.get();
-        Map<String, Team> teamsMap = teamsMapRef.get();
+        binding.pBar.setVisibility(android.view.View.GONE);
+        binding.swipeRefresh.setRefreshing(false);
 
         if (groups == null || teamsMap == null) {
-            runOnUiThread(() -> {
-                binding.pBar.setVisibility(android.view.View.GONE);
-                Toast.makeText(this, "Failed to load standings", Toast.LENGTH_SHORT).show();
-            });
+            String msg = errorMessage != null ? errorMessage : "Failed to load standings";
+            Toast.makeText(this, msg, Toast.LENGTH_LONG).show();
             return;
         }
 
@@ -154,11 +169,8 @@ public class GroupStandingsActivity extends AppCompatActivity {
             displayData.add(new GroupData(group.getName(), rowItems));
         }
 
-        runOnUiThread(() -> {
-            binding.pBar.setVisibility(android.view.View.GONE);
-            binding.recyclerGroups.setVisibility(android.view.View.VISIBLE);
-            adapter.setData(displayData);
-        });
+        binding.recyclerGroups.setVisibility(android.view.View.VISIBLE);
+        adapter.setData(displayData);
     }
 
     private static int parseInt(String s) {
