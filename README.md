@@ -1,94 +1,204 @@
-# TournamentBracketLib
-A library to generate tournament brackets with smooth transition and animations.
+# ⚽ FIFA World Cup 2026 — Bracket & Standings Viewer
 
-Find the Library repository here : https://github.com/Emil333/TournamentBracketLib
+An Android application that displays **live FIFA World Cup 2026 knockout brackets** and **group standings** using real-time data from the [worldcup26.ir](https://worldcup26.ir) API.
 
+Built with **[TournamentBracketLib](https://github.com/Emil333/TournamentBracketLib)** — a custom Android library for rendering tournament brackets with smooth animations and transitions.
 
-https://user-images.githubusercontent.com/32976134/122669203-d7966c00-d1d9-11eb-8471-e88af082aeb3.mp4
+---
 
+## ✨ Features
 
-## Use Cases of TournamentBracketLib
-- Include a layout for tournament brackets in your project
-- provides customisation options for background color, bracket color and text colors
+| Feature | Description |
+|---------|-------------|
+| 🏆 **Knockout Brackets** | Full tournament tree from Round of 32 to the Final, rendered with connectors and animations |
+| 📊 **Group Standings** | All 12 groups with team stats (MP, W, D, L, GF, GA, GD, PTS), sorted by points |
+| 🏳️ **Country Flags** | Team flags loaded from CDN with caching and placeholders |
+| 🔄 **Pull-to-Refresh** | Swipe down on standings to reload live data |
+| 📡 **Live API Data** | No hardcoded values — all data fetched dynamically from the World Cup API |
+| 🏷️ **Match Names** | Each bracket cell shows the round and match number |
+| 📱 **Dark Theme** | Clean dark UI matching the bracket library's styling |
 
-## Find this project useful? ❤️
--  support it by providing a ⭐️ on the upper right of this page.
+---
 
-## Requirement
--  TournamentBracketLib can be included in Android version 7 (Nougat) and above
+## 📸 Screenshots
 
-## Using TournamentBracket in your application
--  Add this to your project level build.gradle
+| Home | Brackets | Group Standings |
+|------|----------|-----------------|
+| ![Home](<img width="1080" height="2424" alt="Screenshot_20260630_171300" src="https://github.com/user-attachments/assets/c483a1da-e034-42ed-b852-b9689ccd64ee" />
+) | ![Brackets](<img width="1080" height="2424" alt="Screenshot_20260630_174237" src="https://github.com/user-attachments/assets/dd591390-0e49-4811-a8ba-222a2cb4ccdf" />
+) | ![Standings](<img width="1080" height="2424" alt="Screenshot_20260630_174304" src="https://github.com/user-attachments/assets/2d651142-fa40-4234-a7f7-b87a220ce844" />
+) |
 
+> *Replace these placeholders with actual screenshots from your device.*
 
-   ```
-   allprojects {
-		repositories {
-			...
-			maven { url 'https://jitpack.io' }
-		}
-	}
-  ````
-  ````
-- Add the dependency
+---
 
-  ```
-  dependencies {
-	        implementation 'com.github.emil-ep:TournamentBracketLib:1.0.4'
-	}
-  ```
-  
-- Add a `BracketsView` component in your XML file
+## 🏗️ Architecture
 
-  ```
-  <com.ventura.bracketslib.BracketsView
-        android:id="@+id/bracket_view"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        app:bracketBackgroundColor="#1c222e"
-        app:bracketColor="#262e40"
-        app:bracketTextColor="#fff" />
-        
-  ```
-- Initialise your BracketsView 
-  ```
-  BracketsView bracketsView = findViewById(R.id.bracket_view);
-  
-  ```
-- Provide the necessary data to populate the Brackets
-  - Breaking down the Attributes
-    - `CompetitorData` corresponds to an object with the necessary team/player data. Takes in `name` and `score` as parameters.
-       ```
-        CompetitorData brazilSemiFinal = new CompetitorData("Brazil", "3");
-        CompetitorData englandSemiFinal = new CompetitorData("England", "1");
-        CompetitorData argentinaSemiFinal = new CompetitorData("Argentina", "3");
-        CompetitorData russiaSemiFinal = new CompetitorData("Russia", "2");
-        CompetitorData brazilFinal = new CompetitorData("Brazil", "4");
-        CompetitorData argentinaFinal = new CompetitorData("Argentina", "2");
-       
-       ```
-       
-    - `MatchData` corresponds to an object with the necessary competitor informations for a particular Match. Takes in two `CompetitorData` as parameters(Team1, Team2).
-      ```
-        MatchData match1SemiFinal = new MatchData(brazilSemiFinal, englandSemiFinal);
-        MatchData match2SemiFinal = new MatchData(argentinaSemiFinal, russiaSemiFinal);
-        MatchData match3Final = new MatchData(brazilFinal, argentinaFinal);
-      ```
-    - `ColomnData` corresponds to list of matches that needs to be displayed in a section (Semi final, final etc). Takes in a list of `MatchData` as parameter.
+```
+app/
+├── activity/
+│   ├── HomeActivity.java             — Landing screen with navigation
+│   ├── MainActivity.java             — Knockout brackets display
+│   └── GroupStandingsActivity.java   — Group tables with pull-to-refresh
+├── adapter/
+│   └── GroupStandingsAdapter.java    — RecyclerView adapter with DiffUtil
+├── model/
+│   ├── WorldCupGame.java             — Match model (knockout/group games)
+│   ├── Group.java / GroupTeamEntry.java — Group standings models
+│   ├── Team.java                     — Team info (name, flag URL)
+│   └── GroupTeamDisplayItem.java     — Merged display model
+└── network/
+    ├── RetrofitClient.java           — Singleton Retrofit setup
+    └── WorldCupApi.java              — API endpoint definitions
+```
 
-      ```
-        ColomnData semiFinalColomn = new ColomnData(Arrays.asList(match1SemiFinal, match2SemiFinal));
-        ColomnData finalColomn = new ColomnData(Arrays.asList(match3Final));
-      ```
-    
-- call the `setBracketsData(List<ColomnData> sectionList)` methods from `bracketsView`
-  ```
-  bracketsView.setBracketsData(Arrays.asList(semiFinalColomn, finalColomn));
-  
-  ```
-  
-- All set 👏🏻
+---
 
+## 🌟 TournamentBracketLib — The Highlight
 
+This app is powered by **[TournamentBracketLib](https://github.com/Emil333/TournamentBracketLib)** — an open-source Android library for generating tournament brackets.
 
-  
+### Library Features
+- 🎯 Smooth bracket transitions and animations
+- 🎨 Customizable colors (background, bracket lines, text)
+- 🖼️ Competitor images (team flags/logos)
+- 🏷️ Match names on each bracket cell
+- 📐 Auto-sizing based on screen dimensions
+
+### Usage in this app
+
+```java
+// Set up competitor with flag image
+CompetitorData home = new CompetitorData("Brazil", "2");
+home.setImageUrl("https://flagcdn.com/w80/br.png");
+
+CompetitorData away = new CompetitorData("Argentina", "1");
+away.setImageUrl("https://flagcdn.com/w80/ar.png");
+
+// Create match with name
+MatchData match = new MatchData(home, away);
+match.setMatchName("QF - Match 97");
+
+// Group matches into columns (rounds)
+ColomnData quarterFinals = new ColomnData(Arrays.asList(match1, match2, match3, match4));
+ColomnData semiFinals = new ColomnData(Arrays.asList(sf1, sf2));
+ColomnData finals = new ColomnData(Arrays.asList(finalMatch));
+
+// Display
+bracketsView.setBracketsData(Arrays.asList(quarterFinals, semiFinals, finals));
+```
+
+### XML Configuration
+
+```xml
+<com.ventura.bracketslib.BracketsView
+    android:id="@+id/bracket_view"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    app:bracketBackgroundColor="#1c222e"
+    app:bracketColor="#262e40"
+    app:bracketTextColor="#fff" />
+```
+
+---
+
+## 📡 API Endpoints
+
+All data is fetched from [worldcup26.ir](https://worldcup26.ir) (no authentication required):
+
+| Endpoint | Description |
+|----------|-------------|
+| `GET /get/games` | All 104 matches (group + knockout) |
+| `GET /get/groups` | 12 group standings with team stats |
+| `GET /get/teams` | 48 teams with names, flags, and FIFA codes |
+| `GET /get/stadiums` | 16 stadium details |
+
+---
+
+## 📋 Requirements
+
+| Requirement | Version |
+|-------------|---------|
+| Android Min SDK | **24** (Android 7.0 Nougat) |
+| Android Target SDK | **34** (Android 14) |
+| Java | **8+** |
+| Gradle | **8.10** |
+| Android Gradle Plugin | **8.1.4** |
+| JDK (for building) | **17** |
+
+---
+
+## 🔧 Dependencies
+
+| Library | Version | Purpose |
+|---------|---------|---------|
+| [TournamentBracketLib](https://github.com/Emil333/TournamentBracketLib) | 1.1.4 | Bracket rendering with animations |
+| [Retrofit](https://github.com/square/retrofit) | 2.9.0 | HTTP API client |
+| [Gson Converter](https://github.com/square/retrofit/tree/master/retrofit-converters/gson) | 2.9.0 | JSON deserialization |
+| [OkHttp Logging](https://github.com/square/okhttp/tree/master/okhttp-logging-interceptor) | 4.11.0 | Network request logging |
+| [Glide](https://github.com/bumptech/glide) | 4.15.1 | Image loading and caching |
+| [SwipeRefreshLayout](https://developer.android.com/jetpack/androidx/releases/swiperefreshlayout) | 1.1.0 | Pull-to-refresh |
+| Material Components | 1.9.0 | UI components |
+
+---
+
+## 🚀 Getting Started
+
+### 1. Clone the repository
+
+```bash
+git clone https://github.com/emil-ep/TournamentBrackets.git
+cd TournamentBrackets
+```
+
+### 2. Open in Android Studio
+
+Open the project in Android Studio (Hedgehog or newer recommended).
+
+### 3. Sync & Build
+
+The project uses JitPack for the bracket library. Ensure your `build.gradle` includes:
+
+```groovy
+allprojects {
+    repositories {
+        google()
+        mavenCentral()
+        maven { url 'https://jitpack.io' }
+    }
+}
+```
+
+### 4. Run
+
+Connect a device or start an emulator (API 24+) and run the app.
+
+---
+
+## 📁 Project Structure
+
+```
+TournamentBrackets/
+├── app/                          — Main application module
+├── build.gradle                  — Top-level build config (AGP 8.1.4)
+├── gradle.properties             — JVM and AndroidX settings
+├── gradle/wrapper/               — Gradle 8.10 wrapper
+└── README.md
+```
+
+---
+
+## ⭐ Find this project useful?
+
+Support it by giving a **⭐️ star** on the upper right of this page!
+
+Your stars help others discover this project and motivate continued development. 🙏
+
+[![GitHub stars](https://img.shields.io/github/stars/emil-ep/TournamentBrackets?style=social)](https://github.com/emil-ep/TournamentBrackets/stargazers)
+
+---
+
+## 📄 License
+
+This project is open-source. See the [LICENSE](LICENSE.md) file for details.
